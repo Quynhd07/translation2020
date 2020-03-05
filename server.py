@@ -11,8 +11,9 @@ import os
 import sources
 
 app = Flask(__name__)
-# app.secret_key = os.environ['translation2020_key']
-app.secret_key = 'test'
+app.secret_key = os.getenv('translation2020_key')
+print(os.getenv('translation2020_key'))
+# app.secret_key = 'test'
 
 # API_KEY = os.environ[]
 
