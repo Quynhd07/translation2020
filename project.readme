@@ -22,4 +22,3 @@ Spring2:
 1. use Twitter api nltk to tokenize candidate's tweets
 2. use tokens to webscrape 
 3. implement sharing feature 
-
