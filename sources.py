@@ -1,7 +1,7 @@
 
 from requests import get
-from bs4 import BeautifulSoup
-
+from bs4 import BeautifulSoup, re
+import string 
 
 
 def get_apnews():
@@ -22,15 +22,30 @@ def get_apnews():
 
     return headings
 
+key_words = string.capwords('biden')
 
 def get_npr():
     url = "https://www.npr.org/sections/politics/"
     response = get(url)
     response_html = BeautifulSoup(response.text, "html.parser")
-    article_containers = response_html.find_all("div", class_ ='item-info-wrap')
-    headings = []
-    for i in range(0,3):
-        headings.append(article_containers[i].text)
+    # find headings that contains the key_words; limit search results to 3
+    article_containers = response_html.findAll("h2", string=re.compile(key_words), attrs = {'class':'title'}, limit = 3)
+    # create dict with urls and headings
+    article_dict = {
+        'headings': [],
+        'urls': []
+    }
+   
+    for i in range(0,len(article_containers)):
+        article_dict['headings'].append(article_containers[i].text)
+        article_dict['urls'].append(article_containers[i].find('a')['href'])
 
-    return headings
+    return article_dict
+
+    
+
+
+
+
+
 

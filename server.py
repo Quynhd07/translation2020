@@ -23,8 +23,8 @@ def homepage():
 
     vietnamese = Translator(to_lang="vi")
 
-    outlets = [sources.get_apnews, sources.get_npr]
-    names = ['APNEWS', 'NPR']
+    outlets = [sources.get_npr]
+    names = ['NPR']
 
     vi_translation = []
     
