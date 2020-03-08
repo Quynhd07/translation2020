@@ -22,10 +22,12 @@
     <br>
 
     <div class='container'>
-        {% for article in articles %}
-        <p>
-            {{ article }}
-        </p>
+        {% for link, article, description in articles_links %}
+        <a href= {{ link }}>
+            <strong>{{ article }}</strong>
+            <p>{{ description }}</p>
+        </a>
+        <br>
         {% endfor %}
     </div>
 

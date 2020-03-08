@@ -12,7 +12,6 @@ import sources
 
 app = Flask(__name__)
 app.secret_key = os.getenv('translation2020_key')
-print(os.getenv('translation2020_key'))
 # app.secret_key = 'test'
 
 # API_KEY = os.environ[]
@@ -21,20 +20,22 @@ print(os.getenv('translation2020_key'))
 def homepage():
     """display headlines"""
 
-    vietnamese = Translator(to_lang="vi")
+    language = Translator(to_lang="vi")
 
-    outlets = [sources.get_npr]
-    names = ['NPR']
+    outlets = [sources.get_nytimes()]
 
-    vi_translation = []
+    translated_headings = []
+    translated_descriptions = []
+    links = []
     
     for i in range(0, len(outlets)):
-        vi_translation.append(names[i])
-        for heading in outlets[i]():
-            translate_heading = vietnamese.translate(heading)
-            vi_translation.append(translate_heading)
 
-    return render_template("base.html", articles = vi_translation)
+        for url, heading, description in zip(outlets[i]['urls'],outlets[i]['headings'], outlets[i]['descriptions']):
+            translated_headings.append(language.translate(heading))
+            translated_descriptions.append(language.translate(description))
+            links.append(url)
+
+    return render_template("base.html", articles_links = zip(links, translated_headings, translated_descriptions))
 
 
 
