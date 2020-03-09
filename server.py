@@ -4,7 +4,6 @@ from translate import Translator
 
 # from jinja2 import StrictUndefined
 
-# from requests import get 
 
 import os 
 
@@ -20,9 +19,15 @@ app.secret_key = os.getenv('translation2020_key')
 def homepage():
     """display headlines"""
 
-    language = Translator(to_lang="vi")
+    choice = request.args.get("language")
+    
+    if choice == None:
+        choice = 'en'
 
-    outlets = [sources.get_nytimes()]
+    language = Translator(to_lang=choice)
+
+
+    outlets = [sources.get_npr(), sources.get_nytimes()]
 
     translated_headings = []
     translated_descriptions = []
