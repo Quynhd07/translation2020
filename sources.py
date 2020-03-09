@@ -5,7 +5,7 @@ import string
 from datetime import date
 
 # create list of keywords 
-key_words = string.capwords('election')
+key_words = string.capwords('corona')
 
 
 def get_npr():

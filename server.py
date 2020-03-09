@@ -1,6 +1,8 @@
 from flask import Flask, render_template, redirect, request, flash
 
-from translate import Translator 
+# from translate import Translator 
+
+from googletrans import Translator
 
 # from jinja2 import StrictUndefined
 
@@ -20,11 +22,11 @@ def homepage():
     """display headlines"""
 
     choice = request.args.get("language")
-    
+
     if choice == None:
         choice = 'en'
 
-    language = Translator(to_lang=choice)
+    language = Translator()
 
 
     outlets = [sources.get_npr(), sources.get_nytimes()]
@@ -36,8 +38,8 @@ def homepage():
     for i in range(0, len(outlets)):
 
         for url, heading, description in zip(outlets[i]['urls'],outlets[i]['headings'], outlets[i]['descriptions']):
-            translated_headings.append(language.translate(heading))
-            translated_descriptions.append(language.translate(description))
+            translated_headings.append(language.translate(heading, dest = choice).text)
+            translated_descriptions.append(language.translate(description, dest = choice).text)
             links.append(url)
 
     return render_template("base.html", articles_links = zip(links, translated_headings, translated_descriptions))
