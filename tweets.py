@@ -1,31 +1,48 @@
 import os 
-# import tweepy objects
-import tweepy
-# sys module provides info about contraints, functions, methods of interpreter
-import sys
+from tweepy import OAuthHandler, API, Cursor
 from collections import Counter 
-from datetime import datetime, date, time, timedelta
+
 
 consumer_key = os.getenv('translation_consumer_key')
 consumer_secret = os.getenv('translation_consumer_secret')
 access_token = os.getenv('translation_access_token')
 access_token_secret = os.getenv('translation_access_token_secret')
 
-auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+# use OAuthHandler class to handle authentication (no callback url needed)
+auth = OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
-api = tweepy.API(auth)
+# call API class to access entire twitter restful api methods 
+api = API(auth)
 
-# create list of handlers of leading candidates
+# dictionary containing last 5 tweets of each candidate
+accounts = {
+    'JoeBiden': [],
+    'BernieSanders': [],
+    'realDonaldTrump': [],
+    'MikeBloomberg': [],
+    'ElizabethWarren': [],
+    'TulsiGabbard': []
+}
 
-account_list = ['JoeBiden', 'BernieSanders', 'realDonaldTrump','MikeBloomberg', 'ElizabethWarren', 'TulsiGabbard']
 
-# iterate through list of candidates and pass into tweepy's API.get_user()
-for candidate in account_list:
-    candidate_info = api.get_user(candidate)
-    print("name: " + candidate_info.name)
-    print("screen_name: " + candidate_info.screen_name)
-    print("description: " + candidate_info.description)
-    print("statuses_count: " + str(candidate_info.statuses_count))
-    print("friends_count: " + str(candidate_info.friends_count))
-    print("followers_count: " + str(candidate_info.followers_count))
+def get_tweets(accounts_dict) -> dict:
+    """From list of accounts, get their 5 most recent tweets."""
+    # iterate through list of accounts
+    for account in accounts:
+        # get each account's timeline of the last 5 tweets
+        for status in Cursor(api.user_timeline,id=account, tweet_mode="extended").items(5):
+            # check is status is a retweet, otherwise full text will be truncated
+            if hasattr(status, 'retweeted_status'):
+                # add to list of tweets by account
+                accounts[account].append(status.retweeted_status.full_text)
+            # else, add tweet to list 
+            else:
+                accounts[account].append(status.full_text)
+    return accounts
+
+
+# tokenize tweets using NLTK or Counter
+
+
+
 
