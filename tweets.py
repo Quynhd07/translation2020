@@ -3,6 +3,7 @@ from tweepy import OAuthHandler, API, Cursor
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.probability import FreqDist
+from nltk.stem import WordNetLemmatizer as wnl
 from string import punctuation
 from re import sub
 
@@ -29,7 +30,7 @@ accounts = {
 }
 
 
-def get_tweets(accounts) -> list:
+def get_tweets() -> list:
     """From list of accounts, get their 5 most recent tweets."""
     # iterate through list of accounts
     for account in accounts:
@@ -41,11 +42,11 @@ def get_tweets(accounts) -> list:
             # get full text of each status
             status = status.full_text
             # remove http link at the end
-            status = sub(r' https://t.co/\S+','', status)
+            status = sub(r'https://t.co/\S+','', status)
             # add to list of tweets by account
             accounts[account].append(status)
 
-    return tokenize_tweets(accounts)
+    return accounts
 
 
 # tokenize tweets using NLTK 
@@ -61,27 +62,39 @@ def tokenize_tweets(accounts) -> list:
         for tweet in tweets:
             all_tweets.extend(word_tokenize(tweet))
 
-    return remove_stop_words(all_tweets)
+    return all_tweets
 
 
-def remove_stop_words(words_list) -> list:
+def filter_tokens(tokens_list) -> list:
     """removes all stopsword and punctuation tokens from list of words"""
-    # create list of english stop words
+    filtered_tokens = []
+    # create set of english stop words
     stop_words = set(stopwords.words('english'))
-    # only add if it is not a stopword, punctuation, and longer than 3 chars 
-    nonstop_words = [word for word in words_list if word not in stop_words and word not in punctuation and len(word) > 3]
-    return nonstop_words
+    # iterate though tokens list
+    for token in tokens_list:
+        # lemmatize (default pos is noun) and lowercase each token
+        token = wnl().lemmatize(token).lower()
+        # only add if it is not a stopword, punctuation, and longer than 3 chars 
+        if token not in stop_words and token not in punctuation and len(token) > 3:
+            filtered_tokens.append(token)
+
+    return filtered_tokens
     
 
-def get_frequent_words(words_list) -> list:
+def get_frequent_tokens() -> list:
     """returns list of most used tokens"""
-    return_list = []
+    # populate accounts by get_tweets; tokenize all tweets into list of unfiltered_tokens
+    unfiltered_list = tokenize_tweets(get_tweets())
+    # filter list of tokens
+    filtered_list = filter_tokens(unfiltered_list)
     # create an object of FreqDist and return top 5 words
-    frequency_count = FreqDist(words_list).most_common(5)
+    frequency_count = FreqDist(filtered_list).most_common(5)
+    top5_tokens = []
     for word, frequency in frequency_count:
-        return_list.append(word)
+        # add only the word in tuple to return_list 
+        top5_tokens.append(word)
 
-    return return_list 
+    return top5_tokens  
 
 
 
