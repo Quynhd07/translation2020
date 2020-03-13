@@ -82,7 +82,7 @@ def filter_tokens(tokens_list) -> list:
     
 
 def get_frequent_tokens() -> list:
-    """returns list of most used tokens"""
+    """returns list of top 5 frequently used tokens"""
     # populate accounts by get_tweets; tokenize all tweets into list of unfiltered_tokens
     unfiltered_list = tokenize_tweets(get_tweets())
     # filter list of tokens

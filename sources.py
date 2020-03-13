@@ -4,24 +4,26 @@ from bs4 import BeautifulSoup, re, Comment
 import string 
 from datetime import date
 
-# create list of keywords 
-key_words = string.capwords('corona')
+# keyword to search 
 
 
-def get_npr():
+def get_npr(token) -> dict:
+    """returns dict of headlines from NPR that match keyword"""
     url = "https://www.npr.org/sections/politics/"
+    # request and store the page's response as response variable 
     response = get(url)
+    # create beautifulsoup object and parse through page 
     response_html = BeautifulSoup(response.text, "html.parser")
-    # find headings that contains the key_words; limit search results to 3
     # find_all returns a list of tag objects
     article_containers = response_html.find_all("div", class_= "item-info")
     
     matched_articles = []
-
+    # find headings that contains the token; add to matched_articles list 
     for article in article_containers:
-        if key_words in article.find("h2").text:
+        if token in article.find("h2").text:
             matched_articles.append(article)
 
+    # create dict to store info from each article 
     article_dict = {
         'headings': [],
         'descriptions': [],
@@ -29,6 +31,7 @@ def get_npr():
         'date': date.today().isoformat()
     }
    
+    # iterate through matched_articles to populate article_dict
     for i in range(0,len(matched_articles)):
         article_dict['headings'].append(matched_articles[i].find('h2').text)
         # remove date from <p>
@@ -40,19 +43,17 @@ def get_npr():
     return article_dict
 
 
-def get_nytimes():
+def get_nytimes(token):
+    """returns dict of headlines from NPR that match keyword"""
     url = "https://www.nytimes.com/section/politics"
     response = get(url)
     response_html = BeautifulSoup(response.text, "html.parser")
-    # find headings that contains the key_words; limit search results to 3
     article_containers = response_html.find_all("div", class_ = "css-1l4spti")
-    # article_containers = response_html.find_all(string=lambda key_words: isinstance(key_words, Comment))
-    # create dict with urls and headings
 
     matched_articles = []
 
     for article in article_containers:
-        if key_words in article.find("h2").text:
+        if token in article.find("h2").text:
             matched_articles.append(article)
 
 
@@ -69,14 +70,7 @@ def get_nytimes():
         full_url = 'https://www.nytimes.com' + matched_articles[i].find('a')['href']
         article_dict['urls'].append(full_url)
         
-
-    # return article_dict
     return article_dict
-
-    
-
-
-
 
 
 

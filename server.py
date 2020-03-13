@@ -1,15 +1,11 @@
 from flask import Flask, render_template, redirect, request, flash
-
 # from translate import Translator 
-
 from googletrans import Translator
-
-# from jinja2 import StrictUndefined
-
-
+import tweets
+from jinja2 import StrictUndefined
 import os 
-
 import sources
+from string import capwords
 
 app = Flask(__name__)
 app.secret_key = os.getenv('translation2020_key')
@@ -19,8 +15,15 @@ app.secret_key = os.getenv('translation2020_key')
 
 @app.route('/')
 def homepage():
-    """display headlines"""
+    """displays list of most frequent tokens use can choose from"""
+    tokens = tweets.get_frequent_tokens()
+    return render_template('homepage.html', tokens = tokens)
 
+
+@app.route('/<token>')
+def display_key(token):
+    """display headlines"""
+    token = capwords(token)
     choice = request.args.get("language")
 
     if choice == None:
@@ -28,8 +31,7 @@ def homepage():
 
     language = Translator()
 
-
-    outlets = [sources.get_npr(), sources.get_nytimes()]
+    outlets = [sources.get_npr(token), sources.get_nytimes(token)]
 
     translated_headings = []
     translated_descriptions = []
@@ -42,7 +44,9 @@ def homepage():
             translated_descriptions.append(language.translate(description, dest = choice).text)
             links.append(url)
 
-    return render_template("base.html", articles_links = zip(links, translated_headings, translated_descriptions))
+    return render_template("base.html", articles_links=zip(links, translated_headings, translated_descriptions), token=token)
+
+
 
 
 
