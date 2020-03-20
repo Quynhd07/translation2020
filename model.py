@@ -1,93 +1,76 @@
-from flask-sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
 # model definitions
-# create party and sources first; they are foreign keys for other tables
+# create user and article first to reference association table 
 
-class Party(db.Model):
-    """optional: candidate's party"""
-
-    __tablename__ = 'parties'
-
-    party_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    party_name = db.Column(db.String(30), nullable=False)
-
-    # backref candidates and party 
-    candidate = db.relationship('Candidate', backref='parties')
-
-    def __repr__(self):
-        """returns id and party name"""
-        return f'<ID: {self.party_id} Party Name: {self.party_name}'
+class ModelMixin:
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
 
 
+class User(ModelMixin, db.Model):
+    """user's session"""
+    __tablename__ = "users"
 
-class Source(db.Model):
-    """source of articles"""
-    
-    __tablename__ = 'sources'
-
-    source_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    source_name = db.Column(db.String(30), nullable=False)
-
-    # backref to Article 
-    article = db.relationship('Article', backref='sources')
+    # user_session = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    user_session = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    user_language = db.Column(db.String(2), nullable=True)
+    # TODO: set visits
 
     def __repr__(self):
-        """return id and source name"""
-        return f'<ID: {self.source_id} Source: {self.source_name}>'
+        return f'<session: {self.user_session} lang: {self.user_language}'
+
+    def serialize(self):
+        return {"user_session": self.user_session,
+                "user_language": self.user_language}
 
 
-
-class Candidate(db.Model):
-    """Leading presidential candidates"""
-
-    __tablename__ = "candidates"
-
-    candidate_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    candidate_name = db.Column(db.String(30), nullable=False)
-    twitter_handle = db.Column(db.String(15), nullable=True)
-    party_id = db.Column(db.Integer, db.Foreign_Key='parties.party_id', nullable=True)
-
-    def __repr__(self):
-        """returns id, name, and twitter handle"""
-        return f'<ID: {self.candidate_id} Name: {self.candidate_name} Twitter: {self.twitter_handle}>'
-
-
-
-class Article(db.Model):
-    """article information"""
-
+class Article(ModelMixin, db.Model):
+    """article info"""
     __tablename__ = "articles"
 
-    article_id = db.Column(db.Integer, autoincrement=True, primary_key= True)
-    article_title = db.Column(db.String(300), nullable=False)
-    source_id = db.Column(db.Integer, db.Foreign_Key=('sources.source_id'))
-    # review DateTime from ratings lab
-    article_date = db.Column(db.DateTime, nullable=False)
-    article_url = db.Column(db.String(300), nullable=False)
+    article_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    article_heading = db.Column(db.String(400), nullable=False)
+    article_url = db.Column(db.String(600), nullable=False)
+    # article_date = db.Column(db.String(10), nullable=False)
 
     def __repr__(self):
-        """returns id and title"""
-        return f'<ID: {self.article_id} Title: {self.article_title}>'
+        return f'<id: {self.article_id} heading: {self.article_heading}>'
 
 
+class User_article(ModelMixin, db.Model):
+    """association table between Article and User"""
+    __tablename__ = "users_articles"
 
-class Candidate_article(db.Model):
-    """association table for candidates and articles"""
-    
-    __tablename__ = "candidates_articles"
+    user_article_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    user_session = db.Column(db.Integer, db.ForeignKey('users.user_session'), nullable=False)
+    article_id = db.Column(db.Integer, db.ForeignKey('articles.article_id'), nullable=False)
 
-    candidate_article_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    candidate_id = db.Column(db.Integer, db.Foreign_Key=('candidates.candidate_id'))
-    article_id = db.Column(db.Integer, db.Foreign_Key=('articles.article_id'))
-
-    # backref to Candidate and Article
-    candidate = db.relationship('Candidate', backref='candidates_articles')
-    article = db.relationship('Article', backref='candidates_articles')
+    user = db.relationship('User', backref='users_articles')
+    article = db.relationship('Article', backref='users_articles')
 
     def __repr__(self):
-        """returns all id's"""
-        return f'<ID: {self.candidate_article_id} Candidate: {candidate_id} Article: {self.article_id}>'
+        return f'<id: {self.user_article_id} session: {self.user_session} article: {self.article_id}>'
 
 
+def connect_to_db(app, uri="postgresql:///translation2020"):
+    """Connect the database to Flask app."""
+
+    # Configure to use our PstgreSQL database
+    app.config['SQLALCHEMY_DATABASE_URI'] = uri
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    db.app = app
+    db.init_app(app)
+
+
+if __name__ == "__main__":
+    # As a convenience, if we run this module interactively, it will leave
+    # you in a state of being able to work with the database directly.
+
+    from server import app
+    connect_to_db(app)
+    db.create_all()
+    print("Connected to DB.")

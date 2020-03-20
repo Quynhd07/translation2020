@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Articles{% endblock %}
+
+{% block content %}
+    <form action="/{{ token }}">
+        Choose your language:
+        <select id="language" name="language">
+            <option value="en">English</option>
+            <option value="zh">Chinese</option>
+            <option value="ko">Korean</option>
+            <option value="lo">Lao</option>
+            <option value="tl">Tagalog</option>
+            <option value="th">Thai</option>
+            <option value="vi">Vietnamese</option>
+        </select>
+        <input type='hidden' value='balloonicornsayshi' name="secret">
+
+        <input type="submit">
+    </form>
+    <br>
+    <div class='container'>
+        {% for link, heading, description in articles_links %}
+        <a href= {{ link }}>
+            <strong>{{ heading }}</strong>
+            <p>{{ description }}</p>
+        </a>
+        <form action='/save'>
+            <input type=submit value="Save">
+            <input type="hidden" name="heading" value= "{{ heading }}"> 
+            <input type="hidden" name="description" value= "{{ description }}"> 
+            <input type="hidden" name="url" value= "{{ link }}"> 
+        </form>
+        <br>
+        {% endfor %}
+    </div>
+
+{% endblock %}

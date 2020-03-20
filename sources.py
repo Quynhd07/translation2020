@@ -1,10 +1,7 @@
 
 from requests import get
 from bs4 import BeautifulSoup, re, Comment
-import string 
 from datetime import date
-
-# keyword to search 
 
 
 def get_npr(token) -> dict:
@@ -27,8 +24,8 @@ def get_npr(token) -> dict:
     article_dict = {
         'headings': [],
         'descriptions': [],
-        'urls': [],
-        'date': date.today().isoformat()
+        'urls': []
+        # 'date': date.today().isoformat()
     }
    
     # iterate through matched_articles to populate article_dict
@@ -43,7 +40,7 @@ def get_npr(token) -> dict:
     return article_dict
 
 
-def get_nytimes(token):
+def get_nytimes(token) -> dict:
     """returns dict of headlines from NPR that match keyword"""
     url = "https://www.nytimes.com/section/politics"
     response = get(url)
@@ -73,4 +70,12 @@ def get_nytimes(token):
     return article_dict
 
 
+def get_sources(token) -> list:
+    """combines all sources into one list"""
+    combined_sources = []
+    sources_list = [get_npr, get_nytimes]
+    for source in sources_list: 
+        combined_sources.append(source(token))
+
+    return combined_sources 
 

@@ -1,55 +1,110 @@
-from flask import Flask, render_template, redirect, request, flash
+from flask import Flask, render_template, redirect, request, session, flash
 # from translate import Translator 
 from googletrans import Translator
 import tweets
 from jinja2 import StrictUndefined
 import os 
-import sources
+from sources import get_sources
 from string import capwords
+from model import ModelMixin, User, Article, User_article, db, connect_to_db
+import uuid
 
 app = Flask(__name__)
 app.secret_key = os.getenv('translation2020_key')
-# app.secret_key = 'test'
+# set lifetime of cookie session 
+app.SESSION_PERMANENT = True
 
 # API_KEY = os.environ[]
 
 @app.route('/')
 def homepage():
     """displays list of most frequent tokens use can choose from"""
+    # if first-time user, create new user and assign user_session to session id 
+    if not session.get('id'):
+        # create instance of user
+        user = User(user_language='en')
+        # save instance to database
+        user.save()
+        # add id property to flask session 
+        session['id'] = user.user_session
+        # default language property to English for first-time users 
+        session['language'] = user.user_language
+    # else:
+    #     session['id'] = None
     tokens = tweets.get_frequent_tokens()
     return render_template('homepage.html', tokens = tokens)
+
+# TODO: change to post request 
+@app.route('/save_to_session')
+def save_to_session():
+    """set new properties to flask session"""
+    # get value of language form from homepage 
+    language = request.args.get("language")
+    # add language to their user_session in database 
+    user = User.query.get(session['id'])
+    user.user_language = language 
+    # add langauge property to flask session 
+    session['language'] = user.user_language
+    user.save()
+    return redirect("/")
+
+# TODO: change to post request; implement AJAX
+@app.route('/save')
+def save_article():
+    article_heading = request.args.get("heading")
+    article_url = request.args.get("url")
+    article = Article(article_heading=article_heading, article_url=article_url)
+    article.save()
+    user_article = User_article(user_session=session['id'], article_id=article.article_id)
+    user_article.save()
+    return redirect("/display_saved_articles")
+
+
+@app.route('/display_saved_articles')
+def display_saved_article():
+    user_articles = User_article.query.filter_by(user_session=session['id']).all()
+    article_list = []
+    url_list = []
+    for ua in user_articles:
+        article_list.append(ua.article.article_heading)
+        url_list.append(ua.article.article_url)
+    return render_template("saved.html", articles=zip(url_list,article_list))
+
 
 
 @app.route('/<token>')
 def display_key(token):
-    """display headlines"""
+    """displays headlines"""
+    # capitalize first letter to search in headings 
     token = capwords(token)
-    choice = request.args.get("language")
-
-    if choice == None:
-        choice = 'en'
-
+    # create instance of Translator 
     language = Translator()
+    # get user's language 
+    choice = session['language']
 
-    outlets = [sources.get_npr(token), sources.get_nytimes(token)]
-
+    # organize info into separate lists as they get translated  
     translated_headings = []
     translated_descriptions = []
     links = []
-    
-    for i in range(0, len(outlets)):
-
-        for url, heading, description in zip(outlets[i]['urls'],outlets[i]['headings'], outlets[i]['descriptions']):
+    # run the token to get relevant articles 
+    sources = get_sources(token)
+    # iterate through all sources and add to lists above 
+    for i in range(0, len(sources)):
+        for url, heading, description in zip(sources[i]['urls'],sources[i]['headings'], sources[i]['descriptions']):
             translated_headings.append(language.translate(heading, dest = choice).text)
             translated_descriptions.append(language.translate(description, dest = choice).text)
             links.append(url)
 
-    return render_template("base.html", articles_links=zip(links, translated_headings, translated_descriptions), token=token)
-
+    return render_template("articles.html", articles_links=zip(links, translated_headings, translated_descriptions), token=token)
 
 
 
 
 if __name__ == "__main__":
-    # connect_to_db(app)
+    connect_to_db(app)
+    from flask_debugtoolbar import DebugToolbarExtension
+    app.debug = True    
+    app.jinja_env.auto_reload = app.debug
+    app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+    DebugToolbarExtension(app)
     app.run(host="0.0.0.0", debug=True)

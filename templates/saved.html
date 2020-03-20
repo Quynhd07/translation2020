@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title%}Saved Articles{% endblock %}
+
+{% block content %}
+<ul>
+{% for link, heading in articles %}
+    <li>
+        <a href={{ link }}>
+            <h3>{{ heading }}</h3>
+        </a>
+    </li>
+{% endfor %}
+</ul>
+{% endblock %}

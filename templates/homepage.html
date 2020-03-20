@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title%}HOMEPAGE{% endblock %}
+
+{% block content %}
+    <form action="/save_to_session">
+        Choose your language:
+        <select id="language" name="language">
+            <option value="en">English</option>
+            <option value="zh">Chinese</option>
+            <option value="ko">Korean</option>
+            <option value="lo">Lao</option>
+            <option value="tl">Tagalog</option>
+            <option value="th">Thai</option>
+            <option value="vi">Vietnamese</option>
+        </select>
+        <input type='submit'>
+    </form>
+    <div class='container'>
+        {% for token in tokens %}
+        <a href="/{{ token }}">
+            <h1>{{ token }}</h1>
+        </a>
+        {% endfor %}
+    </div>
+ {% endblock %}
