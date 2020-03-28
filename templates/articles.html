@@ -32,6 +32,14 @@
             <input type="hidden" name="url" value= "{{ link }}"> 
         </form>
         <br>
+        <form action='/share_article'>
+            <input type=submit value="Share">
+            <input type=text name="phone_number" placeholder="Phone Number">
+            <input type="hidden" name="heading" value= "{{ heading }}"> 
+            <input type="hidden" name="description" value= "{{ description }}"> 
+            <input type="hidden" name="url" value= "{{ link }}"> 
+        </form>
+        <br>
         {% endfor %}
     </div>
 

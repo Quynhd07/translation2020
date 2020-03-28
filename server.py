@@ -7,14 +7,18 @@ import os
 from sources import get_sources
 from string import capwords
 from model import ModelMixin, User, Article, User_article, db, connect_to_db
-import uuid
+from twilio.rest import Client
+
 
 app = Flask(__name__)
 app.secret_key = os.getenv('translation2020_key')
+twilio_test_sid = os.getenv('TWILIO_TEST_SID')
+twilio_test_token = os.getenv('TWILIO_TEST_TOKEN')
+twilio_account_sid = os.getenv('TWILIO_ACCOUNT_SID')
+twilio_auth_token = os.getenv('TWILIO_AUTH_TOKEN')
 # set lifetime of cookie session 
 app.SESSION_PERMANENT = True
 
-# API_KEY = os.environ[]
 
 @app.route('/')
 def homepage():
@@ -29,8 +33,9 @@ def homepage():
         session['id'] = user.user_session
         # default language property to English for first-time users 
         session['language'] = user.user_language
-    # else:
-    #     session['id'] = None
+    # elif not session.get('language')
+    #     user = User(user_language='en')
+    #     user
     tokens = tweets.get_frequent_tokens()
     return render_template('homepage.html', tokens = tokens)
 
@@ -69,6 +74,20 @@ def display_saved_article():
         article_list.append(ua.article.article_heading)
         url_list.append(ua.article.article_url)
     return render_template("saved.html", articles=zip(url_list,article_list))
+
+
+@app.route('/share_article')
+def share_article():
+    article_heading = request.args.get("heading")
+    article_url = request.args.get("url")
+    article_description = request.args.get("description")
+    phone_number = request.args.get("phone_number")
+    client = Client(twilio_account_sid, twilio_auth_token)
+    message = client.messages.create(body=article_heading + ':' + article_description + '\nCheck it out: ' + article_url,
+                            from_='+18315315730', 
+                            to=phone_number)
+    print(message.sid)
+    return redirect("/")
 
 
 
