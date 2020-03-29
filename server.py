@@ -44,14 +44,16 @@ def homepage():
 def save_to_session():
     """set new properties to flask session"""
     # get value of language form from homepage 
-    language = request.args.get("language")
+    print('test')
+    language = request.args.get('language')
+    print(language)
     # add language to their user_session in database 
     user = User.query.get(session['id'])
     user.user_language = language 
     # add langauge property to flask session 
     session['language'] = user.user_language
     user.save()
-    return redirect("/")
+    return "Your preference has been saved."
 
 # TODO: change to post request; implement AJAX
 @app.route('/save')
@@ -86,7 +88,6 @@ def share_article():
     message = client.messages.create(body=article_heading + ':' + article_description + '\nCheck it out: ' + article_url,
                             from_='+18315315730', 
                             to=phone_number)
-    print(message.sid)
     return redirect("/")
 
 

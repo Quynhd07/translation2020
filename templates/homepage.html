@@ -11,7 +11,7 @@
     <img src="https://pbs.twimg.com/profile_images/1216174212517388288/52ugsj_B_400x400.jpg" atl="gabbard">
     </div>
     <br>
-    <form action="/save_to_session">
+    <form id="session_lang">
         Choose your language:
         <select id="language" name="language">
             <option value="en">English</option>
@@ -24,6 +24,7 @@
         </select>
         <input type='submit'>
     </form>
+    <div id="session_message"></div>
     <div class='container'>
         {% for token in tokens %}
         <a href="/{{ token }}">
@@ -31,4 +32,19 @@
         </a>
         {% endfor %}
     </div>
- {% endblock %}
+{% endblock %}
+
+{% block jscript %}
+<script src="http://code.jquery.com/jquery.js"></script>
+<script>
+$('#session_lang').on('submit', function(evt) {
+    evt.preventDefault();
+    let url = '/save_to_session';
+    let formData = $('#language option:selected').val();
+    $.get(url, {'language':formData}, (res) => {
+      $('#session_message').html(res);
+    });
+});
+</script>
+
+{% endblock %}
