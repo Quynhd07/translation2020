@@ -3,42 +3,29 @@
 {% block title %}Articles{% endblock %}
 
 {% block content %}
-    <form id='token' action="/{{ token }}">
-        Choose your language:
-        <select id="language" name="language">
-            <option value="en">English</option>
-            <option value="zh">Chinese</option>
-            <option value="ko">Korean</option>
-            <option value="lo">Lao</option>
-            <option value="tl">Tagalog</option>
-            <option value="th">Thai</option>
-            <option value="vi">Vietnamese</option>
-        </select>
-        <input type='hidden' value='balloonicornsayshi' name="secret">
-
-        <input type="submit">
-    </form>
-    <br>
     <div class='container'>
         {% for link, heading, description in articles_links %}
         <a href= {{ link }}>
             <strong>{{ heading }}</strong>
             <p>{{ description }}</p>
         </a>
+        <div class='row'>
+        
+        <form class='share_article'>
+            <input type=text name="phone_number" placeholder="Phone Number">
+            <input type="hidden" name="share_article_heading" value= "{{ heading }}"> 
+            <input type="hidden" name="share_article_description" value= "{{ description }}"> 
+            <input type="hidden" name="share_article_url" value= "{{ link }}"> 
+            <input type="submit" class="btn btn-outline-secondary btn-sm" name="share_article_submit_btn" value="Share">
+        </form>
         <form class='save_article'>
             <input type="hidden" name="save_article_heading" value= "{{ heading }}"> 
             <input type="hidden" name="save_article_description" value= "{{ description }}"> 
             <input type="hidden" name="save_article_url" value= "{{ link }}">
-            <input type="submit" name="save_article_submit_btn" value="Save"> 
+            <input type="submit" class="btn btn-outline-danger btn-sm" name="save_article_submit_btn" value="Save"> 
         </form>
-        <br>
-        <form class='share_article' action='/share_article'>
-            <input type="submit" value="Share">
-            <input type=text name="phone_number" placeholder="Phone Number">
-            <input type="hidden" name="heading" value= "{{ heading }}"> 
-            <input type="hidden" name="description" value= "{{ description }}"> 
-            <input type="hidden" name="url" value= "{{ link }}"> 
-        </form>
+
+        </div>
         <br>
         {% endfor %}
     </div>
@@ -48,7 +35,7 @@
 {% block jscript %}
 <script src="http://code.jquery.com/jquery.js"></script>
 <script>
-
+//ajax request for saving articles
 $('.save_article').on('submit',function(evt) {
     evt.preventDefault();
     let url = '/save_article';
@@ -57,6 +44,20 @@ $('.save_article').on('submit',function(evt) {
     let formData = {'heading': article_heading,'url': article_url};
     $.get(url, formData, () => {
         $(this).find('input[name="save_article_submit_btn"]').fadeOut();
+    });
+});
+
+//ajax request for sharing articles 
+$('.share_article').on('submit',function(evt) {
+    evt.preventDefault();
+    let url = '/share_article';
+    let article_heading = $(this).find('input[name="share_article_heading"]').val();
+    let article_url = $(this).find('input[name="share_article_url"]').val();
+    let article_description = $(this).find('input[name="share_article_description"]').val();
+    let phone_number = $(this).find('input[name="phone_number"]').val();
+    let formData = {'heading': article_heading,'url': article_url, 'description': article_description, 'phone_number': phone_number};
+    $.get(url, formData, () => {
+        $(this).find('input[name="phone_number"]').val("");
     });
 });
 

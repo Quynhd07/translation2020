@@ -26,7 +26,8 @@ accounts = {
     'realDonaldTrump': [],
     'MikeBloomberg': [],
     'ElizabethWarren': [],
-    'TulsiGabbard': []
+    'TulsiGabbard': [],
+    'AndrewYang': []
 }
 
 

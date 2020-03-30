@@ -84,11 +84,10 @@ def share_article():
     article_description = request.args.get("description")
     phone_number = request.args.get("phone_number")
     client = Client(twilio_account_sid, twilio_auth_token)
-    message = client.messages.create(body=article_heading + ':' + article_description + '\nCheck it out: ' + article_url,
+    client.messages.create(body=article_heading + ':' + article_description + '\nCheck it out: ' + article_url,
                             from_='+18315315730', 
                             to=phone_number)
-    return redirect("/")
-
+    return Response(status = 200)
 
 
 @app.route('/<token>')
