@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, request, session, flash
+from flask import Flask, render_template, redirect, request, session, flash, Response
 # from translate import Translator 
 from googletrans import Translator
 import tweets
@@ -40,11 +40,10 @@ def homepage():
     return render_template('homepage.html', tokens = tokens)
 
 # TODO: change to post request 
-@app.route('/save_to_session')
-def save_to_session():
+@app.route('/save_lang_to_session')
+def save_lang_to_session():
     """set new properties to flask session"""
     # get value of language form from homepage 
-    print('test')
     language = request.args.get('language')
     print(language)
     # add language to their user_session in database 
@@ -56,7 +55,7 @@ def save_to_session():
     return "Your preference has been saved."
 
 # TODO: change to post request; implement AJAX
-@app.route('/save')
+@app.route('/save_article')
 def save_article():
     article_heading = request.args.get("heading")
     article_url = request.args.get("url")
@@ -64,7 +63,7 @@ def save_article():
     article.save()
     user_article = User_article(user_session=session['id'], article_id=article.article_id)
     user_article.save()
-    return redirect("/display_saved_articles")
+    return Response(status = 200)
 
 
 @app.route('/display_saved_articles')

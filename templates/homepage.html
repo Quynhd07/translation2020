@@ -39,7 +39,7 @@
 <script>
 $('#session_lang').on('submit', function(evt) {
     evt.preventDefault();
-    let url = '/save_to_session';
+    let url = '/save_lang_to_session';
     let formData = $('#language option:selected').val();
     $.get(url, {'language':formData}, (res) => {
       $('#session_message').html(res);

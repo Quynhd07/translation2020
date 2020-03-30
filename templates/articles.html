@@ -3,7 +3,7 @@
 {% block title %}Articles{% endblock %}
 
 {% block content %}
-    <form action="/{{ token }}">
+    <form id='token' action="/{{ token }}">
         Choose your language:
         <select id="language" name="language">
             <option value="en">English</option>
@@ -25,15 +25,15 @@
             <strong>{{ heading }}</strong>
             <p>{{ description }}</p>
         </a>
-        <form action='/save'>
-            <input type=submit value="Save">
-            <input type="hidden" name="heading" value= "{{ heading }}"> 
-            <input type="hidden" name="description" value= "{{ description }}"> 
-            <input type="hidden" name="url" value= "{{ link }}"> 
+        <form class='save_article'>
+            <input type="hidden" name="save_article_heading" value= "{{ heading }}"> 
+            <input type="hidden" name="save_article_description" value= "{{ description }}"> 
+            <input type="hidden" name="save_article_url" value= "{{ link }}">
+            <input type="submit" name="save_article_submit_btn" value="Save"> 
         </form>
         <br>
-        <form action='/share_article'>
-            <input type=submit value="Share">
+        <form class='share_article' action='/share_article'>
+            <input type="submit" value="Share">
             <input type=text name="phone_number" placeholder="Phone Number">
             <input type="hidden" name="heading" value= "{{ heading }}"> 
             <input type="hidden" name="description" value= "{{ description }}"> 
@@ -42,5 +42,24 @@
         <br>
         {% endfor %}
     </div>
+
+{% endblock %}
+
+{% block jscript %}
+<script src="http://code.jquery.com/jquery.js"></script>
+<script>
+
+$('.save_article').on('submit',function(evt) {
+    evt.preventDefault();
+    let url = '/save_article';
+    let article_heading = $(this).find('input[name="save_article_heading"]').val();
+    let article_url = $(this).find('input[name="save_article_url"]').val();
+    let formData = {'heading': article_heading,'url': article_url};
+    $.get(url, formData, () => {
+        $(this).find('input[name="save_article_submit_btn"]').fadeOut();
+    });
+});
+
+</script>
 
 {% endblock %}
