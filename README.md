@@ -14,29 +14,31 @@ AAPIVotes 2020 is a full-stack application in an effort to  reduce language barr
 ## Tech Stack
 
 API: Twitter, Twilio
+
 Front End: JavaScript, HTML/CSS, jQuery&AJAX, Bootstrap
+
 Back End: Python, Flask, Jinja, SQLAlchemy ORM, PostgreSQL
 
 ## Features
-Landing Page
+#### Landing Page
 
 Users must first select a language that they wish to read in. If a language is not selected, the default setting is English. After the first visit, the app automatically saves the user's language preference for future visits - given that they are not viewing in incognito mode. Users can choose from the top 5 most frequently used words by all leading presidential candidates shown above. 
 
 <a href="https://ibb.co/XJjzQjC"><img src="https://i.ibb.co/tCQbGQJ/Screen-Shot-2020-04-04-at-7-21-22-PM.png" alt="Screen-Shot-2020-04-04-at-7-21-22-PM" border="0"></a>
 
-### View Articles
+#### View Articles
 
 This page renders articles from major news outlets that contain the keyword that the users chose from the landing page. The purpose is for them to get a quick overview of headlines including a description for each. If a user is interested in reading an article in its entirety, the hyperlink redirects them to the original source. 
 In addition, users can save articles they wish to revisit. Once users click on the save button, it will fade out indicating that the article has been saved to "My Saved Articles" on the top right corner of the page. 
 
 <a href="https://ibb.co/fYZkMCq"><img src="https://i.ibb.co/8DGrMjN/Screen-Shot-2020-04-04-at-7-27-03-PM.png" alt="Screen-Shot-2020-04-04-at-7-27-03-PM" border="0"></a>
 
-### Share Articles 
+#### Share Articles 
 Users can also share articles by filling in the "Phone Number" form. The end-user will receive the message in the following format:
 
 <a href="https://ibb.co/xzP9LmX"><img src="https://i.ibb.co/SVWYyQ5/Screenshot-2020-04-04-at-4-44-40-PM.jpg" alt="Screenshot-2020-04-04-at-4-44-40-PM" border="0"></a>
 
-### Save Articles
+#### Save Articles
 Users can view previously saved articles in their chosen language. SQLAlchemy ORM is used to query articles saved by a user's session id.  The hyperlink will redirect users to the original source where they can view the full content.
 <a href="https://ibb.co/jRf8tyw"><img src="https://i.ibb.co/GTpdmWM/Screen-Shot-2020-04-04-at-7-28-36-PM.png" alt="Screen-Shot-2020-04-04-at-7-28-36-PM" border="0"></a># 
 
