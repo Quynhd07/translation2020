@@ -57,7 +57,7 @@ https://github.com/quynhd07/translation2020.git
 
 ```
 
-Create and activate a virtual environment inside your JobTracker directory:
+Create and activate a virtual environment inside your Translation directory:
 
 ```
 virtualenv env
